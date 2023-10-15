@@ -10,8 +10,8 @@
         <StackPanel Margin="8,8,8,8">
             <Button Name="ReadSheetButton" Margin="8,8,8,8" Width="100" Click="ReadSheet_Click">Read Sheet</Button>
             <Label>step 1: download the skins spreadhseet as TAB SEPARATED VALUES</Label>
-            <Label>step 2: Click "Read Sheet" above. Select the sheet you downloaded.</Label>
-            <Label>step 3: Check your desktop. Look at the "skins" folder.</Label>
+            <Label>step 2: Click "Read Sheet" above. Select the sheet you downloaded. Select a folder for the output.</Label>
+            <Label>step 3: Check the output path you chose earlier. Look at the "skins" folder.</Label>
             <Label>step 3a: if you are adding a new character or changing a character's name, you must update deluxe menu's config.yml.</Label>
             <Label>you will see config_EXAMPLE.yml in the "configs" folder.  </Label>
             <Label>step 4: upload files in the skins folder to the server. ignore the "configs" folder</Label>
