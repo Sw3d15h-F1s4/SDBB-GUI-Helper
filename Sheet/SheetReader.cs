@@ -30,11 +30,11 @@ namespace SDBBGuiHelper.Sheet
             var lines = Sheet.ReadToEnd().Split(new char[] { '\n' });
 
             GuiReqItem redTeamCheck = new("team_check", "string equals");
-            redTeamCheck.AddExtraInfo("input: '%team_name%'");
-            redTeamCheck.AddExtraInfo("output: 'Red'");
+            redTeamCheck.Extra.Add("input: '%team_name%'");
+            redTeamCheck.Extra.Add("output: 'Red'");
             GuiReqItem blueTeamCheck = new("team_check", "string equals");
-            blueTeamCheck.AddExtraInfo("input: '%team_name%'");
-            blueTeamCheck.AddExtraInfo("output: 'Blue'");
+            blueTeamCheck.Extra.Add("input: '%team_name%'");
+            blueTeamCheck.Extra.Add("output: 'Blue'");
 
             foreach (var row in lines)
             {
@@ -42,7 +42,7 @@ namespace SDBBGuiHelper.Sheet
                 {
                     Console.WriteLine("[WARN] Skipping a line, nothing found.");
                     continue;
-                }  
+                }
                 var cols = row.Split(new char[] { '\t' });
 
                 if (cols.Length != 10)
@@ -51,7 +51,7 @@ namespace SDBBGuiHelper.Sheet
                     Console.WriteLine("[ERROR] Improperly formatted spreadsheet line. LINE:" + row);
                     continue;
                 }
-                
+
                 if (cols[0] == "" || cols[0].ToLower() == "character")
                 {
                     Console.WriteLine("[WARN] Skipping a line, header or just empty.");
@@ -71,7 +71,7 @@ namespace SDBBGuiHelper.Sheet
 
                 if (!Menus.ContainsKey(characterName))
                 {
-                    Menus.Add(characterName, new GuiMenu(characterName + "''s Skins!", "open" + characterName.ToLower().Replace(" ","") + "skins"));
+                    Menus.Add(characterName, new GuiMenu(characterName + "''s Skins!", "open" + characterName.ToLower().Replace(" ", "") + "skins"));
                 }
                 var internalSkin = new StringBuilder();
                 internalSkin.Append(characterName.ToLower().Replace(" ", "_"));
@@ -79,19 +79,35 @@ namespace SDBBGuiHelper.Sheet
                 internalSkin.Append(skinName.ToLower().Replace(" ", "_"));
                 internalSkin.Replace("&", "");
 
-                var clickRequirements = new GuiRequirement();
-                var scoreCheck = new GuiReqItem("score_check", "string equals");
-                scoreCheck.AddExtraInfo("input: '%objective_score_{heroType}%'");
-                scoreCheck.AddExtraInfo("output: '" + characterId + "'");
-                clickRequirements.AddReqItem(scoreCheck);
-                clickRequirements.AddDenyCommand("[message] &cYou need to select " + characterName + " to access this skin.");
+                var clickRequirements = new GuiRequirement()
+                {
+                    RequirementItems =
+                    {
+                        new("score_check", "string equals")
+                        {
+                            Extra =
+                            {
+                                "input: '%objective_score_{heroType}%'",
+                                "output: '" + characterId + "'",
+                            }
+                        }
+                    },
+                    DenyCommands =
+                    {
+                        new(ActionTypes.Message, " &cYou need to select ", characterName, " to access this skin.")
+                    }
+                    
+                };
 
+                var viewReqRedTeam = new GuiRequirement()
+                {
+                    RequirementItems = { redTeamCheck }
+                };
 
-                var viewReqRedTeam = new GuiRequirement();
-                viewReqRedTeam.AddReqItem(redTeamCheck);
-
-                var viewReqBlueTeam = new GuiRequirement();
-                viewReqBlueTeam.AddReqItem(blueTeamCheck);
+                var viewReqBlueTeam = new GuiRequirement()
+                {
+                    RequirementItems = { blueTeamCheck }
+                };
 
                 switch (skinRarity)
                 {
@@ -105,10 +121,10 @@ namespace SDBBGuiHelper.Sheet
                         skinName = "&r&d&l" + skinName;
                         break;
                     case "Legendary":
-                        skinName = "&r&6&l" + skinName; 
+                        skinName = "&r&6&l" + skinName;
                         break;
                     case "Mythical":
-                        skinName = "&r&4&kABC &r&4&l" + skinName + " &r&4&kABC"; 
+                        skinName = "&r&4&kABC &r&4&l" + skinName + " &r&4&kABC";
                         break;
                     case "Legacy":
                         skinName = "&r&f" + skinName;
@@ -119,31 +135,41 @@ namespace SDBBGuiHelper.Sheet
                 }
 
 
-                if (permission != "(none)\r")
+                if (!permission.Contains("none"))
                 {
                     var permissionCheck = new GuiReqItem("permission_check", "has permission");
-                    permissionCheck.AddExtraInfo("permission: " + permission);
-                    viewReqBlueTeam.AddReqItem(permissionCheck);
-                    viewReqRedTeam.AddReqItem(permissionCheck);
+                    permissionCheck.Extra.Add("permission: " + permission);
+                    viewReqBlueTeam.RequirementItems.Add(permissionCheck);
+                    viewReqRedTeam.RequirementItems.Add(permissionCheck);
+                    permission = permission.Replace("\r", "");
                 }
 
-                var newSkinRed = new GuiItem(internalSkin.ToString()+"_red", skinName, skinHeadRed, slotNumber, 1);
-
-                newSkinRed.AddLore(skinRarity);
-                newSkinRed.AddViewRequirement(viewReqRedTeam);
-                newSkinRed.AddClickRequirement(clickRequirements);
-                newSkinRed.AddClickCommand("[player] skin url " + skinRedLink);
-                newSkinRed.AddClickCommand("[close]");
-                
-                
-                var newSkinBlue = new GuiItem(internalSkin.ToString()+"_blue", skinName, skinHeadBlue, slotNumber, 2);
-
-                newSkinBlue.AddLore(skinRarity);
-                newSkinBlue.AddViewRequirement(viewReqBlueTeam);
-                newSkinBlue.AddClickRequirement(clickRequirements);
-                newSkinBlue.AddClickCommand("[player] skin url " + skinBlueLink);
-                newSkinBlue.AddClickCommand("[close]");
-
+                var newSkinRed = new GuiItem(internalSkin.ToString() + "_red", skinName, skinHeadRed)
+                {
+                    Slot = slotNumber,
+                    Lore = new() { skinRarity },
+                    Priority = 1,
+                    ViewRequirements = viewReqRedTeam,
+                    ClickRequirements = clickRequirements,
+                    ClickCommands =
+                    {
+                        new(ActionTypes.Player, " skin url ", skinRedLink),
+                        new(ActionTypes.Close),
+                    }
+                };
+                var newSkinBlue = new GuiItem(internalSkin.ToString() + "_red", skinName, skinHeadBlue)
+                {
+                    Slot = slotNumber,
+                    Lore = new() { skinRarity },
+                    Priority = 2,
+                    ViewRequirements = viewReqBlueTeam,
+                    ClickRequirements = clickRequirements,
+                    ClickCommands =
+                    {
+                        new(ActionTypes.Player, " skin url ", skinBlueLink),
+                        new(ActionTypes.Close),
+                    }
+                };
 
                 Menus[characterName].AddItem(newSkinRed);
                 Menus[characterName].AddItem(newSkinBlue);
@@ -158,8 +184,8 @@ namespace SDBBGuiHelper.Sheet
 
             foreach(var menu in Menus)
             {
-                GuiItem goBack = new("goback", "Go Back", "BARRIER", menu.Value.InventorySize - 1);
-                goBack.AddClickCommand("[openguimenu] skins_menu");
+                GuiItem goBack = new("goback", "Go Back", "BARRIER", ((int)menu.Value.InventorySize) - 1);
+                goBack.ClickCommands.Add(new(ActionTypes.OpenGuiMenu, " skins_menu"));
                 menu.Value.AddItem(goBack);
             }
 
@@ -174,7 +200,7 @@ namespace SDBBGuiHelper.Sheet
             {
                 GuiItem link = new(item.Key.ToLower().Replace(" ", ""), item.Key + " Skins...", item.Value, slot);
                 slot++;
-                link.AddClickCommand("[openguimenu] " + item.Key.ToLower().Replace(" ", "_") + "_menu");
+                link.ClickCommands.Add(new(ActionTypes.OpenGuiMenu, " ", item.Key.ToLower().Replace(" ", "_") , "_menu"));
                 skinsMenu.AddItem(link);
             }
             Menus.Add("skins", skinsMenu);

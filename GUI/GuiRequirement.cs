@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,35 +10,40 @@ namespace SDBBGuiHelper.GUI
 {
     internal class GuiRequirement
     {
-        private List<GuiReqItem> RequirementItems;
-        private List<String> DenyCommands;
+        public readonly List<GuiReqItem> RequirementItems;
+        public readonly List<GuiAction> DenyCommands;
+        public readonly int MinimumRequirements;
+        public readonly bool StopAtSuccess;
 
         public GuiRequirement() //TODO: add more functionalty to make this not seem useles.
         {
-            RequirementItems = new List<GuiReqItem>();
-            DenyCommands = new List<String>();
+            RequirementItems = new();
+            DenyCommands = new();
+            StopAtSuccess = false;
+            MinimumRequirements = 1;
         }
 
-        public void AddReqItem(GuiReqItem item) { RequirementItems.Add(item); }
-        public void AddDenyCommand(String item) { DenyCommands.Add(item);}
         public void PrintRequirements(StreamWriter file, int tabLevel)
         {
-            file.WriteLine(IndentHandler.WriteTabbed("requirements:", tabLevel));
+            file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "minimum_requirements: ", MinimumRequirements.ToString()));
+            file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "stop_at_success: ", StopAtSuccess.ToString().ToLower()));
+
+            file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "requirements:"));
             foreach (GuiReqItem item in RequirementItems)
             {
-                file.WriteLine(IndentHandler.WriteTabbed(item.Name + ":", tabLevel + 1));
-                file.WriteLine(IndentHandler.WriteTabbed("type: '" + item.Type + "'", tabLevel + 2));
-                foreach (String extra in item.Extra)
+                file.WriteLine(IndentHandler.WriteTabbed(tabLevel + 1, item.Name , ":"));
+                file.WriteLine(IndentHandler.WriteTabbed(tabLevel + 2, "type: '" , item.Type , "'"));
+                foreach (var extra in item.Extra)
                 {
-                    file.WriteLine(IndentHandler.WriteTabbed(extra, tabLevel + 2)); //lazy
+                    file.WriteLine(IndentHandler.WriteTabbed(tabLevel + 2, extra)); //lazy
                 }
             }
             if (DenyCommands.Count > 0)
             {
-                file.WriteLine(IndentHandler.WriteTabbed("deny_commands:", tabLevel));
-                foreach (String command in DenyCommands)
+                file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "deny_commands:"));
+                foreach (var command in DenyCommands)
                 {
-                    file.WriteLine(IndentHandler.WriteTabbed("- '" + command + "'", tabLevel + 2));
+                    command.PrintAction(file, tabLevel + 1);
                 }
             }
         }

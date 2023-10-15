@@ -13,12 +13,10 @@ namespace SDBBGuiHelper.GUI
         public List<String> Extra;
 
         public GuiReqItem(string name, string type) {
-            this.Name = name;
-            this.Type = type;
-            this.Extra = new();
+            Name = name;
+            Type = type;
+            Extra = new(); //i dont see a good reason to waste hours adding every type of requirement, yet.
         }
-
-        public void AddExtraInfo(string extraInfo) { Extra.Add(extraInfo); }
 
     }
 }

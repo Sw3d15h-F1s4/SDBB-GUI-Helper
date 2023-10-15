@@ -8,18 +8,17 @@ namespace SDBBGuiHelper.GUI
 {
     internal class IndentHandler
     {
-        public static String WriteTabbed(string text, int tabLevel = 0)
+        public static string WriteTabbed(int tabLevel, params string[] text)
         {
-            if (tabLevel == 0)
-            {
-                return text;
-            }
             StringBuilder sb = new();
             for (int i = 0; i < tabLevel; i++)
             {
                 sb.Append("  ");
             }
-            sb.Append(text);
+            foreach (var item in text)
+            {
+                sb.Append(item);
+            }
             return sb.ToString();
         }
     }
