@@ -96,10 +96,10 @@ namespace SDBBGuiHelper.Sheet
                 switch (skinRarity)
                 {
                     case "Common":
-                        skinName = "&r&c" + skinName;
+                        skinName = "&r&a&l" + skinName;
                         break;
                     case "Rare":
-                        skinName = "&r&a&l" + skinName;
+                        skinName = "&r&b&l" + skinName;
                         break;
                     case "Epic":
                         skinName = "&r&d&l" + skinName;
@@ -108,7 +108,10 @@ namespace SDBBGuiHelper.Sheet
                         skinName = "&r&6&l" + skinName; 
                         break;
                     case "Mythical":
-                        skinName = "&r&5&l" + skinName; 
+                        skinName = "&r&4&kABC &r&4&l" + skinName + " &r&4&kABC"; 
+                        break;
+                    case "Legacy":
+                        skinName = "&r&f" + skinName;
                         break;
                     default:
                         skinName = "&r&e" + skinName;
