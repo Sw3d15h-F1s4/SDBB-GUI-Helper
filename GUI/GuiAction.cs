@@ -25,7 +25,6 @@ namespace SDBBGuiHelper.GUI
             sb.Append(Action);
             foreach (var arg in Arguments)
             {
-                sb.Append(' ');
                 sb.Append(arg);
             }
             sb.Append('\'');

@@ -74,9 +74,9 @@ namespace SDBBGuiHelper.Sheet
                     Menus.Add(characterName, new GuiMenu(characterName + "''s Skins!", "open" + characterName.ToLower().Replace(" ", "") + "skins"));
                 }
                 var internalSkin = new StringBuilder();
-                internalSkin.Append(characterName.ToLower().Replace(" ", "_"));
-                internalSkin.Append("_");
-                internalSkin.Append(skinName.ToLower().Replace(" ", "_"));
+                internalSkin.Append(characterName.ToLower().Replace(' ', '_'));
+                internalSkin.Append('_');
+                internalSkin.Append(skinName.ToLower().Replace(' ', '_'));
                 internalSkin.Replace("&", "");
 
                 var clickRequirements = new GuiRequirement()
@@ -138,10 +138,10 @@ namespace SDBBGuiHelper.Sheet
                 if (!permission.Contains("none"))
                 {
                     var permissionCheck = new GuiReqItem("permission_check", "has permission");
+                    permission = permission.Replace("\r", "");
                     permissionCheck.Extra.Add("permission: " + permission);
                     viewReqBlueTeam.RequirementItems.Add(permissionCheck);
                     viewReqRedTeam.RequirementItems.Add(permissionCheck);
-                    permission = permission.Replace("\r", "");
                 }
 
                 var newSkinRed = new GuiItem(internalSkin.ToString() + "_red", skinName, skinHeadRed)

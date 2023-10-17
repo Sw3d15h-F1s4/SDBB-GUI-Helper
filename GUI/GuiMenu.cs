@@ -105,8 +105,11 @@ namespace SDBBGuiHelper.GUI
             file.Write("register_command: ");
             file.WriteLine(RegisterCommand.ToString().ToLower());
 
-            file.Write("inventory_type: ");
-            file.WriteLine(InventoryType);
+            if (InventoryType != InventoryTypes.Chest)
+            {
+                file.Write("inventory_type: ");
+                file.WriteLine(InventoryType);
+            }
 
             if (InventoryType == InventoryTypes.Chest)
             {
