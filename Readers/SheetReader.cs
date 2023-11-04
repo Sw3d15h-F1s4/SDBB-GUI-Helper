@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace SDBBGuiHelper.Sheet
+namespace SDBBGuiHelper.Readers
 {
     internal class SheetReader
     {
@@ -157,7 +157,7 @@ namespace SDBBGuiHelper.Sheet
                         new(ActionTypes.Close),
                     }
                 };
-                var newSkinBlue = new GuiItem(internalSkin.ToString() + "_red", skinName, skinHeadBlue)
+                var newSkinBlue = new GuiItem(internalSkin.ToString() + "_blue", skinName, skinHeadBlue)
                 {
                     Slot = slotNumber,
                     Lore = new() { skinRarity },
@@ -198,9 +198,15 @@ namespace SDBBGuiHelper.Sheet
             var slot = 0;
             foreach (var item in Defaults)
             {
-                GuiItem link = new(item.Key.ToLower().Replace(" ", ""), item.Key + " Skins...", item.Value, slot);
+                GuiItem link = new(item.Key.ToLower().Replace(" ", ""), item.Key + " Skins...", item.Value)
+                {
+                    Slot = slot,
+                    ClickCommands = new()
+                    {
+                        new(ActionTypes.OpenGuiMenu, " ", item.Key.ToLower().Replace(" ", "_"), "_menu")
+                    }
+                };
                 slot++;
-                link.ClickCommands.Add(new(ActionTypes.OpenGuiMenu, " ", item.Key.ToLower().Replace(" ", "_") , "_menu"));
                 skinsMenu.AddItem(link);
             }
             Menus.Add("skins", skinsMenu);
