@@ -14,14 +14,12 @@ namespace SDBBGuiHelper.Readers
 
         private StreamReader Sheet;
 
-        private Dictionary<string, GuiMenu> Menus;
-
-        private Dictionary<string, string> Defaults;
+        // nathan hack
+        private GuiMenu Menu;
 
         public SheetReader(StreamReader file)
         {
-            Menus = new();
-            Defaults = new(); 
+            Menu = new("Skins Menu", "skinsmenu", true);
             Sheet = file;  
         }
 
@@ -69,10 +67,12 @@ namespace SDBBGuiHelper.Readers
                 var slotNumber = int.Parse(cols[8]);
                 var permission = cols[9];
 
-                if (!Menus.ContainsKey(characterName))
-                {
-                    Menus.Add(characterName, new GuiMenu(characterName + "''s Skins!", "open" + characterName.ToLower().Replace(" ", "") + "skins"));
-                }
+                
+                GuiReqItem characterCheck = new("score_check", "string equals");
+                characterCheck.Extra.Add("input: '%objective_score_{heroType}%'");
+                characterCheck.Extra.Add("output: '" + characterId + "'");
+
+
                 var internalSkin = new StringBuilder();
                 internalSkin.Append(characterName.ToLower().Replace(' ', '_'));
                 internalSkin.Append('_');
@@ -81,32 +81,23 @@ namespace SDBBGuiHelper.Readers
 
                 var clickRequirements = new GuiRequirement()
                 {
-                    RequirementItems =
-                    {
-                        new("score_check", "string equals")
-                        {
-                            Extra =
-                            {
-                                "input: '%objective_score_{heroType}%'",
-                                "output: '" + characterId + "'",
-                            }
-                        }
-                    },
+                    RequirementItems = { characterCheck },
+
                     DenyCommands =
                     {
                         new(ActionTypes.Message, " &cYou need to select ", characterName, " to access this skin.")
                     }
-                    
+
                 };
 
                 var viewReqRedTeam = new GuiRequirement()
                 {
-                    RequirementItems = { redTeamCheck }
+                    RequirementItems = { redTeamCheck, characterCheck}
                 };
 
                 var viewReqBlueTeam = new GuiRequirement()
                 {
-                    RequirementItems = { blueTeamCheck }
+                    RequirementItems = { blueTeamCheck, characterCheck}
                 };
 
                 switch (skinRarity)
@@ -148,7 +139,7 @@ namespace SDBBGuiHelper.Readers
                 {
                     Slot = slotNumber,
                     Lore = new() { skinRarity },
-                    Priority = 1,
+                    Priority = 1 + int.Parse(characterId),
                     ViewRequirements = viewReqRedTeam,
                     ClickRequirements = clickRequirements,
                     ClickCommands =
@@ -161,7 +152,7 @@ namespace SDBBGuiHelper.Readers
                 {
                     Slot = slotNumber,
                     Lore = new() { skinRarity },
-                    Priority = 2,
+                    Priority = 100 + int.Parse(characterId),
                     ViewRequirements = viewReqBlueTeam,
                     ClickRequirements = clickRequirements,
                     ClickCommands =
@@ -171,67 +162,21 @@ namespace SDBBGuiHelper.Readers
                     }
                 };
 
-                Menus[characterName].AddItem(newSkinRed);
-                Menus[characterName].AddItem(newSkinBlue);
+                Menu.AddItem(newSkinRed);
+                Menu.AddItem(newSkinBlue);
+                Menu.InventorySize = GuiMenu.InventorySizes.TWO_ROWS;
 
-
-                if (skinRarity == "Default Skin")
-                {
-                    Defaults.Add(characterName, skinHeadRed);
-                }
             }
             Sheet.Close();
-
-            foreach(var menu in Menus)
-            {
-                GuiItem goBack = new("goback", "Go Back", "BARRIER", ((int)menu.Value.InventorySize) - 1);
-                goBack.ClickCommands.Add(new(ActionTypes.OpenGuiMenu, " skins_menu"));
-                menu.Value.AddItem(goBack);
-            }
-
-            MakeMainSkinMenu();
         }
 
-        private void MakeMainSkinMenu()
-        {
-            GuiMenu skinsMenu = new("Skins Menu", "skinsmenu", true);
-            var slot = 0;
-            foreach (var item in Defaults)
-            {
-                GuiItem link = new(item.Key.ToLower().Replace(" ", ""), item.Key + " Skins...", item.Value)
-                {
-                    Slot = slot,
-                    ClickCommands = new()
-                    {
-                        new(ActionTypes.OpenGuiMenu, " ", item.Key.ToLower().Replace(" ", "_"), "_menu")
-                    }
-                };
-                slot++;
-                skinsMenu.AddItem(link);
-            }
-            Menus.Add("skins", skinsMenu);
-        }
 
-        public void PrintMenus(string outputDir)
+        public void PrintMenu(string outputDir)
         {
             Directory.CreateDirectory(outputDir);
-            foreach (var item in Menus)
-            {
-                item.Value.PrintMenu(new(Path.Combine(outputDir, item.Key.ToLower().Replace(" ","_") + "_menu.yml")));
-            }
+            Menu.PrintMenu(new(Path.Combine(outputDir, "skinsmenu.yml")));
         }
-        public void PrintMenuConfig(string outputDir)
-        {
-            Directory.CreateDirectory(outputDir);
-            var file = new StreamWriter(Path.Combine(outputDir, "config_EXAMPLE.yml"));
-            
-            foreach (var item in Menus)
-            {
-                file.WriteLine("  " + item.Key.ToLower().Replace(" ", "_") + "_menu:");
-                file.WriteLine("    file: skins/" + item.Key.ToLower().Replace(" ", "_") + "_menu.yml");
-            }
-            file.Close();
-        }
+
 
     }
 }
