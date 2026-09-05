@@ -59,8 +59,8 @@ namespace SDBBGuiHelper
             var sheetreader = new SheetReader(new(dialog.FileName));
             sheetreader.ReadCharSkinSheet();
 
-            sheetreader.PrintMenus(System.IO.Path.Combine(outputPath,"skins"));
-            sheetreader.PrintMenuConfig(System.IO.Path.Combine(outputPath, "skins", "configs"));
+
+            sheetreader.PrintMenu(System.IO.Path.Combine(outputPath,"skins"));
         }
 
         private void ReadSheet_Click(object sender, RoutedEventArgs e)
