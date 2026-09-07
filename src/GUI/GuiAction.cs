@@ -11,7 +11,7 @@ internal class GuiAction(string Action, params string[] Arguments)
         sb.Append(Action);
         foreach (var arg in Arguments)
         {
-            sb.Append(arg);
+            sb.Append(EscapeString(arg));
         }
         sb.Append('\'');
         file.WriteLine(IndentHandler.WriteTabbed(tabLevel, sb.ToString()));

@@ -1,4 +1,6 @@
-﻿namespace GUI;
+﻿global using static GUI.YAMLEscapeString;
+
+namespace GUI;
 
 internal class GuiItem(
     string item_name,
@@ -10,8 +12,8 @@ internal class GuiItem(
 )
 {
     public string ItemName                  = item_name;
-    private readonly string DisplayName     = display_name;
-    private readonly string Material        = material;
+    public string DisplayName               = display_name;
+    public string Material                  = material;
     public int Slot                         = slot;
     public List<string>? Slots;
     public List<string>? Lore;
@@ -51,12 +53,12 @@ internal class GuiItem(
 
     public void PrintItem(StreamWriter file, int tabLevel = 1)
     {
-        file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "'", ItemName, "':"));
+        file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "'", EscapeString(ItemName), "':"));
 
         tabLevel++;
 
         file.Write(IndentHandler.WriteTabbed(tabLevel, "material: "));
-        file.WriteLine(Material);
+        file.WriteLine(EscapeString(Material));
 
         if (Data != null)
         {
@@ -67,7 +69,7 @@ internal class GuiItem(
         if (DynamicAmount != null)
         {
             file.Write(IndentHandler.WriteTabbed(tabLevel, "dynamic_amount: "));
-            file.WriteLine(DynamicAmount);
+            file.WriteLine("'" + EscapeString(DynamicAmount) + "'");
         }
         else
         {
@@ -87,7 +89,7 @@ internal class GuiItem(
             foreach (var str in NbtStrings)
             {
                 file.WriteLine(
-                    IndentHandler.WriteTabbed(tabLevel + 1, "- '", str.Key, ":", str.Value, "'")
+                    IndentHandler.WriteTabbed(tabLevel + 1, "- '", EscapeString(str.Key), ":", EscapeString(str.Value), "'")
                 );
             }
         }
@@ -170,7 +172,7 @@ internal class GuiItem(
         }
 
         file.Write(IndentHandler.WriteTabbed(tabLevel, "display_name: "));
-        file.WriteLine("'" + DisplayName + "'");
+        file.WriteLine("'" + EscapeString(DisplayName) + "'");
 
         if (Slots == null || Slots?.Count == 0)
         {
@@ -279,7 +281,7 @@ internal class GuiItem(
             file.WriteLine(IndentHandler.WriteTabbed(tabLevel, "lore: "));
             foreach (var loreLine in Lore)
             {
-                file.WriteLine(IndentHandler.WriteTabbed(tabLevel + 1, "- '", loreLine, "'"));
+                file.WriteLine(IndentHandler.WriteTabbed(tabLevel + 1, "- '", EscapeString(loreLine), "'"));
             }
         }
 

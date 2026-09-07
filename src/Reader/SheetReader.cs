@@ -208,32 +208,6 @@ internal class SheetReader(StreamReader file)
         }
 
         Logger.Instance.WriteLine("INF: Highest slot number is " + largestSlot);
-
-        if (largestSlot < 8) {
-          Menu.InventorySize = GuiMenu.InventorySizes.ONE_ROW;
-          Logger.Instance.WriteLine("INF: Choosing a one row menu.");
-        } else
-        if (largestSlot < 17) {
-          Menu.InventorySize = GuiMenu.InventorySizes.TWO_ROWS;
-          Logger.Instance.WriteLine("INF: Choosing a two row menu.");
-        } else
-        if (largestSlot < 26) {
-          Menu.InventorySize = GuiMenu.InventorySizes.THREE_ROWS;
-          Logger.Instance.WriteLine("INF: Choosing a three row menu.");
-        } else
-        if (largestSlot < 35) {
-          Menu.InventorySize = GuiMenu.InventorySizes.FOUR_ROWS;
-          Logger.Instance.WriteLine("INF: Choosing a four row menu.");
-        } else
-        if (largestSlot < 44) {
-          Menu.InventorySize = GuiMenu.InventorySizes.FIVE_ROWS;
-          Logger.Instance.WriteLine("INF: Choosing a five row menu.");
-        } else
-        if (largestSlot < 53) {
-          Menu.InventorySize = GuiMenu.InventorySizes.SIX_ROWS;
-          Logger.Instance.WriteLine("INF: Choosing a six row menu.");
-        }
-
         file.Close();
     }
 

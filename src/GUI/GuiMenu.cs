@@ -70,7 +70,7 @@ internal class GuiMenu(string menu_title, string open_command, bool register = f
     public void PrintMenu(StreamWriter file)
     {
         file.Write("menu_title: ");
-        file.WriteLine("'" + MenuTitle + "'");
+        file.WriteLine("'" + EscapeString(MenuTitle) + "'");
 
         file.Write("open_command: ");
         file.WriteLine(OpenCommand);
