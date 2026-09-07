@@ -2,19 +2,19 @@
 
 internal class GuiMenu(string menu_title, string open_command, bool register = false)
 {
-    public string MenuTitle = menu_title; // Title of the menu.
-    public string OpenCommand = open_command; // Command to open menu. Must be unique.
-    public bool RegisterCommand = register; // True if you want the OpenCommand to appear on the client's end.
-    public List<GuiAction> OpenCommands = []; // Commands run when the menu is opened.
-    public List<GuiAction> CloseCommands = []; // Commands run ONLY when [close] action is sent.
-    public List<string> Args = []; // Optional arguments to use in the menu.
-    public string? ArgsUsageMessage; // Tab completion for the client.
-    public int? UpdateInterval; // How often items are able to update.
+    public string MenuTitle               = menu_title;             // Title of the menu.
+    public string OpenCommand             = open_command;           // Command to open menu. Must be unique.
+    public bool RegisterCommand           = register;               // True if you want the OpenCommand to appear on the client's end.
+    public List<GuiAction> OpenCommands   = [];                     // Commands run when the menu is opened.
+    public List<GuiAction> CloseCommands  = [];                     // Commands run ONLY when [close] action is sent.
+    public List<string> Args              = [];                     // Optional arguments to use in the menu.
+    public string? ArgsUsageMessage;                                // Tab completion for the client.
+    public int? UpdateInterval;                                     // How often items are able to update.
 
-    public GuiRequirement OpenRequirement = new(); // Requirements to view the menu.
-    public List<GuiItem> Items = []; // The list of items in the menu.
-    public InventorySizes InventorySize = InventorySizes.ONE_ROW; // Size of the inventory. Defaults to 9, adjust automagically.
-    public string InventoryType = InventoryTypes.Chest; // Should be an InventoryTypes
+    public GuiRequirement OpenRequirement = new();                  // Requirements to view the menu.
+    public List<GuiItem> Items            = [];                     // The list of items in the menu.
+    public InventorySizes InventorySize   = InventorySizes.ONE_ROW; // Size of the inventory. Defaults to 9, adjust automagically.
+    public string InventoryType           = InventoryTypes.Chest;   // Should be an InventoryTypes
 
     public enum InventorySizes : int
     {

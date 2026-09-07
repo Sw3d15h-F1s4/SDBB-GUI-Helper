@@ -9,14 +9,14 @@ internal class GuiItem(
     int priority = 0
 )
 {
-    public string ItemName = item_name;
-    private readonly string DisplayName = display_name;
-    private readonly string Material = material;
-    public int Slot = slot;
+    public string ItemName                  = item_name;
+    private readonly string DisplayName     = display_name;
+    private readonly string Material        = material;
+    public int Slot                         = slot;
     public List<string>? Slots;
     public List<string>? Lore;
     public int? Data;
-    public int Amount = amount;
+    public int Amount                       = amount;
     public string? DynamicAmount;
     public int? ModelData;
     public Dictionary<string, string>? NbtStrings;
@@ -27,15 +27,15 @@ internal class GuiItem(
     public Tuple<int, int, int>? RGB;
     public List<string>? ItemFlags;
     public string? BaseColor;
-    public int Priority = priority; //0 is highest priority
-    public GuiRequirement ViewRequirements = new();
+    public int Priority                     = priority; //0 is highest priority
+    public GuiRequirement ViewRequirements  = new();
     public GuiRequirement ClickRequirements = new();
     public GuiRequirement? LeftClickRequirements;
     public GuiRequirement? RightClickRequirements;
     public GuiRequirement? MiddleClickRequirements;
     public GuiRequirement? ShiftLeftClickRequirements;
     public GuiRequirement? ShiftRightClickRequirements;
-    public List<GuiAction> ClickCommands = [];
+    public List<GuiAction> ClickCommands    = [];
     public List<GuiAction>? LeftClickCommands;
     public List<GuiAction>? RightClickCommands;
     public List<GuiAction>? MiddleClickCommands;

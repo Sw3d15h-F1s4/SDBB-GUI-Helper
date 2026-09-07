@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
-using Readers;
+using Reader;
+using Logging;
 
 class MainProgram
 {
@@ -17,10 +18,15 @@ class MainProgram
             return 0;
         }
 
-        if (args.Contains("-V"))
+        if (args.Contains("-v"))
         {
             PrintVersion();
             return 0;
+        }
+
+        if (args.Contains("-V"))
+        {
+          Logger.Instance.VerboseMode = true;
         }
 
         string infile_str;
@@ -73,7 +79,7 @@ class MainProgram
 
     static void PrintUsage()
     {
-        Console.WriteLine("usage: sdbb-gui [-h][-V] -i input_file -o output_directory");
+        Console.WriteLine("usage: sdbb-gui [-h][-V][-v] -i input_file -o output_directory");
     }
 
     static void PrintHelp()
@@ -83,7 +89,8 @@ class MainProgram
         Console.WriteLine("");
         Console.WriteLine("-i input_file      \t\tInput character spreadsheet");
         Console.WriteLine("-o output_directory\t\tOutput GUI menu path");
-        Console.WriteLine("-V                 \t\tPrint version");
+        Console.WriteLine("-V                 \t\tVerbose output");
+        Console.WriteLine("-v                 \t\tPrint version");
         Console.WriteLine("");
         Console.WriteLine("Report bugs to Sw3d15h-F1s4");
     }
