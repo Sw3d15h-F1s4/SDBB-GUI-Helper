@@ -1,168 +1,140 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace GUI;
 
-namespace SDBBGuiHelper.GUI
+internal class GuiMenu(string menu_title, string open_command, bool register = false)
 {
-    internal class GuiMenu
+    public string MenuTitle = menu_title; // Title of the menu.
+    public string OpenCommand = open_command; // Command to open menu. Must be unique.
+    public bool RegisterCommand = register; // True if you want the OpenCommand to appear on the client's end.
+    public List<GuiAction> OpenCommands = []; // Commands run when the menu is opened.
+    public List<GuiAction> CloseCommands = []; // Commands run ONLY when [close] action is sent.
+    public List<string> Args = []; // Optional arguments to use in the menu.
+    public string? ArgsUsageMessage; // Tab completion for the client.
+    public int? UpdateInterval; // How often items are able to update.
+
+    public GuiRequirement OpenRequirement = new(); // Requirements to view the menu.
+    public List<GuiItem> Items = []; // The list of items in the menu.
+    public InventorySizes InventorySize = InventorySizes.ONE_ROW; // Size of the inventory. Defaults to 9, adjust automagically.
+    public string InventoryType = InventoryTypes.Chest; // Should be an InventoryTypes
+
+    public enum InventorySizes : int
     {
-        public string MenuTitle;                                    // Title of the menu.
-        public string OpenCommand;                                  // Command to open menu. Must be unique.
-        public bool RegisterCommand;                                // True if you want the OpenCommand to appear on the client's end.
-        public List<GuiAction> OpenCommands;                        // Commands run when the menu is opened.
-        public List<GuiAction> CloseCommands;                       // Commands run ONLY when [close] action is sent.
-        public List<string> Args;                                   // Optional arguments to use in the menu.
-        public string? ArgsUsageMessage;                            // Tab completion for the client.
-        public int? UpdateInterval;                                 // How often items are able to update.
+        ONE_ROW = 9,
+        TWO_ROWS = 18,
+        THREE_ROWS = 27,
+        FOUR_ROWS = 36,
+        FIVE_ROWS = 45,
+        SIX_ROWS = 54,
+    }
 
-        public GuiRequirement OpenRequirement;             // Requirements to view the menu.
-        public List<GuiItem> Items;                        // The list of items in the menu.
-        public InventorySizes InventorySize;                        // Size of the inventory. Defaults to 9, adjust automagically.
-        public string InventoryType;                       // Should be an InventoryTypes
-        public enum InventorySizes : int
+    public bool AddItem(GuiItem item)
+    {
+        if (InventoryType != InventoryTypes.Chest)
         {
-            ONE_ROW = 9,
-            TWO_ROWS = 18,
-            THREE_ROWS = 27,
-            FOUR_ROWS = 36,
-            FIVE_ROWS = 45,
-            SIX_ROWS = 54,
-        }
-
-        public GuiMenu(string menu_title, string open_command, bool register = false)
-        {
-            MenuTitle = menu_title;
-            OpenCommand = open_command;
-            InventoryType = InventoryTypes.Chest;
-            InventorySize = InventorySizes.ONE_ROW;
-            RegisterCommand = register;
-
-            Items = new();
-            OpenRequirement = new();
-            OpenCommands = new();
-            CloseCommands = new();
-            Args = new();
-        }
-
-
-        public bool AddItem(GuiItem item)
-        {
-            if (InventoryType != InventoryTypes.Chest)
-            {
-                Items.Add(item);
-                return true;
-            }
-            if (item.Slot > 8)
-            {
-                InventorySize = InventorySizes.TWO_ROWS;
-            }
-            if (item.Slot > 17)
-            {
-                InventorySize = InventorySizes.THREE_ROWS;
-            }
-            if (item.Slot > 26)
-            {
-                InventorySize = InventorySizes.FOUR_ROWS;
-            }
-            if (item.Slot > 35)
-            {
-                InventorySize = InventorySizes.FIVE_ROWS;
-            }
-            if (item.Slot > 45)
-            {
-                InventorySize = InventorySizes.SIX_ROWS;
-            }
-            if (item.Slot > 53)
-            {
-                //throw new Exception("Too many items in one menu! Attempted to index past slot 53");
-                return false;
-            }
             Items.Add(item);
             return true;
         }
-
-        public void RemoveItem(GuiItem item)
+        if (item.Slot > 8)
         {
-            if (this.Items.Contains(item))
+            InventorySize = InventorySizes.TWO_ROWS;
+        }
+        if (item.Slot > 17)
+        {
+            InventorySize = InventorySizes.THREE_ROWS;
+        }
+        if (item.Slot > 26)
+        {
+            InventorySize = InventorySizes.FOUR_ROWS;
+        }
+        if (item.Slot > 35)
+        {
+            InventorySize = InventorySizes.FIVE_ROWS;
+        }
+        if (item.Slot > 45)
+        {
+            InventorySize = InventorySizes.SIX_ROWS;
+        }
+        if (item.Slot > 53)
+        {
+            //throw new Exception("Too many items in one menu! Attempted to index past slot 53");
+            return false;
+        }
+        Items.Add(item);
+        return true;
+    }
+
+    public void RemoveItem(GuiItem item)
+    {
+        Items.Remove(item);
+    }
+
+    public void PrintMenu(StreamWriter file)
+    {
+        file.Write("menu_title: ");
+        file.WriteLine("'" + MenuTitle + "'");
+
+        file.Write("open_command: ");
+        file.WriteLine(OpenCommand);
+
+        file.Write("register_command: ");
+        file.WriteLine(RegisterCommand.ToString().ToLower());
+
+        if (InventoryType != InventoryTypes.Chest)
+        {
+            file.Write("inventory_type: ");
+            file.WriteLine(InventoryType);
+        }
+
+        if (InventoryType == InventoryTypes.Chest)
+        {
+            file.Write("size: ");
+            file.WriteLine((int)InventorySize);
+        }
+
+        if (OpenRequirement.RequirementItems.Count > 0)
+        {
+            file.WriteLine("open_requirement:");
+            OpenRequirement.PrintRequirements(file, 1);
+        }
+
+        if (OpenCommands.Count > 0)
+        {
+            file.WriteLine("open_commands:");
+            foreach (var command in OpenCommands)
             {
-                this.Items.Remove(item);
+                command.PrintAction(file, 1);
             }
         }
 
-
-        public void PrintMenu(StreamWriter file)
+        if (CloseCommands.Count > 0)
         {
-            file.Write("menu_title: ");
-            file.WriteLine("'" + this.MenuTitle + "'");
-
-            file.Write("open_command: ");
-            file.WriteLine(this.OpenCommand);
-
-            file.Write("register_command: ");
-            file.WriteLine(RegisterCommand.ToString().ToLower());
-
-            if (InventoryType != InventoryTypes.Chest)
+            file.WriteLine("close_commands:");
+            foreach (var command in CloseCommands)
             {
-                file.Write("inventory_type: ");
-                file.WriteLine(InventoryType);
+                command.PrintAction(file, 1);
             }
-
-            if (InventoryType == InventoryTypes.Chest)
-            {
-                file.Write("size: ");
-                file.WriteLine((int)InventorySize);
-            }
-
-            if (OpenRequirement.RequirementItems.Count > 0)
-            {
-                file.WriteLine("open_requirement:");
-                OpenRequirement.PrintRequirements(file, 1);
-            }
-
-            if (OpenCommands.Count > 0)
-            {
-                file.WriteLine("open_commands:");
-                foreach (var command in OpenCommands)
-                {
-                    command.PrintAction(file, 1);
-                }
-            }
-
-            if (CloseCommands.Count > 0)
-            {
-                file.WriteLine("close_commands:");
-                foreach (var command in CloseCommands)
-                {
-                    command.PrintAction(file, 1);
-                }
-            }
-
-            if (Args.Count > 0)
-            {
-                file.WriteLine("args:");
-                foreach (var arg in Args)
-                {
-                    file.WriteLine(IndentHandler.WriteTabbed(1, "- ", arg));
-                }
-            }
-
-            if (ArgsUsageMessage != null)
-            {
-                file.Write("args_usage_message: ");
-                file.WriteLine(ArgsUsageMessage);
-            }
-
-
-            file.WriteLine("items: ");
-            foreach (GuiItem item in Items)
-            {
-                item.PrintItem(file, 1);
-                file.WriteLine();
-            }
-            file.Close();
         }
+
+        if (Args.Count > 0)
+        {
+            file.WriteLine("args:");
+            foreach (var arg in Args)
+            {
+                file.WriteLine(IndentHandler.WriteTabbed(1, "- ", arg));
+            }
+        }
+
+        if (ArgsUsageMessage != null)
+        {
+            file.Write("args_usage_message: ");
+            file.WriteLine(ArgsUsageMessage);
+        }
+
+        file.WriteLine("items: ");
+        foreach (GuiItem item in Items)
+        {
+            item.PrintItem(file, 1);
+            file.WriteLine();
+        }
+        file.Close();
     }
 }

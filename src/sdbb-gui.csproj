@@ -1,11 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <StartupObject>MainProgram</StartupObject>
-  </PropertyGroup>
 
+    <OutputPath>..\build\</OutputPath>
+    <PublishDir>$(OutputPath)\publish</PublishDir>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+
+    <NoWarn>$(NoWarn);0649</NoWarn>
+
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <PublishRelease>true</PublishRelease>
+
+    <Version>4.1</Version>
+
+  </PropertyGroup>
 </Project>

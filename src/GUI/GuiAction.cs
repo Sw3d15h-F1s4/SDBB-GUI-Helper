@@ -1,34 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
-namespace SDBBGuiHelper.GUI
+namespace GUI;
+
+internal class GuiAction(string Action, params string[] Arguments)
 {
-    internal class GuiAction
+    public void PrintAction(StreamWriter file, int tabLevel)
     {
-        public readonly string Action;
-        public readonly string[] Arguments;
-
-        public GuiAction ( string action, params string[] arguments)
+        StringBuilder sb = new();
+        sb.Append("- '");
+        sb.Append(Action);
+        foreach (var arg in Arguments)
         {
-            Action = action;
-            Arguments = arguments;
+            sb.Append(arg);
         }
-
-        public void PrintAction(StreamWriter file, int tabLevel)
-        {
-            StringBuilder sb = new();
-            sb.Append("- '");
-            sb.Append(Action);
-            foreach (var arg in Arguments)
-            {
-                sb.Append(arg);
-            }
-            sb.Append('\'');
-            file.WriteLine(IndentHandler.WriteTabbed(tabLevel, sb.ToString()));
-        }
+        sb.Append('\'');
+        file.WriteLine(IndentHandler.WriteTabbed(tabLevel, sb.ToString()));
     }
 }
