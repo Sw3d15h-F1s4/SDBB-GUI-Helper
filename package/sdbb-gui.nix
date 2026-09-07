@@ -6,7 +6,7 @@
 buildDotnetModule {
 
   pname = "sdbb-gui";
-  version = "4.1";
+  version = "4.2.0";
 
   src = ../src;
 
